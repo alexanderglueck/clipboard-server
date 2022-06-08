@@ -18,7 +18,7 @@ class ApiPostController extends Controller
         $url = new Post($request->validated());
         $url->device_id = $request->input('device_id');
 
-        $request->user()->urls()->save($url);
+        $request->user()->posts()->save($url);
 
         $this->sendToDevice($url);
 
