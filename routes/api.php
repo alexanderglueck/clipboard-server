@@ -22,6 +22,7 @@ use App\Http\Controllers\API\ApiPostController;
 Route::post('/session', [ApiLoginController::class, 'login'])->name('api.login');
 
 Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/devices', [ApiDeviceController::class, 'index'])->name('api.devices.index');
     Route::post('/remove-token', [ApiTokenController::class, 'destroy'])->name('api.token.destroy');
     Route::post('/attach-token', [ApiTokenController::class, 'store'])->name('api.token.store');
     Route::post('/paste', [ApiPostController::class, 'store'])->name('api.post.store');
