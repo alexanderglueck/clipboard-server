@@ -17,6 +17,10 @@ class Post extends Model
         'content',
     ];
 
+    protected $casts = [
+        'content' => 'encrypted'
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
