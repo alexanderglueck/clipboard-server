@@ -21,10 +21,6 @@ class AzureController extends Controller
         try {
             # https://docs.microsoft.com/en-us/previous-versions/windows/apps/hh465435(v=win.10)
 
-            # Toast
-            # $notification = new Notification("windows", $toast);
-            # $notification->headers[] = 'X-WNS-Type: wns/toast';
-
             # Raw
             $notification = new Notification("windows", $request->input('content'));
             $notification->headers[] = 'X-WNS-Type: wns/raw';
@@ -41,5 +37,4 @@ class AzureController extends Controller
 
         return response('', 201);
     }
-
 }

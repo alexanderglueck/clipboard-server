@@ -3,11 +3,12 @@
 namespace App\Azure;
 
 use Exception;
+use Illuminate\Support\Facades\Http;
 
 class NotificationHub
 {
-    const API_VERSION = "api-version=2013-10";
-    // const API_VERSION = "api-version=2015-04";
+//    const API_VERSION = "api-version=2013-10";
+    const API_VERSION = "api-version=2015-04";
 
     private string $endpoint;
     private string $hubPath;
@@ -63,8 +64,6 @@ class NotificationHub
         # build uri
         $uri = $this->endpoint . $this->hubPath . "/messages?" . NotificationHub::API_VERSION;
 
-        $ch = curl_init($uri);
-
         if (in_array($notification->format, ["template", "apple", "gcm"])) {
             $contentType = "application/json";
         } else if ($notification->format == 'windows') {
@@ -76,47 +75,26 @@ class NotificationHub
         $token = $this->generateSasToken($uri);
 
         $headers = [
-            'Authorization: ' . $token,
-            'Content-Type: ' . $contentType,
-            'ServiceBusNotification-Format: ' . $notification->format,
+            'Authorization' => $token,
+            'ServiceBusNotification-Format' => $notification->format,
         ];
 
         if ($tag != null) {
-            $headers[] = "ServiceBusNotification-Tags: " . $tag;
+            $headers["ServiceBusNotification-Tags"] = $tag;
         }
 
         # add headers for other platforms
         if (is_array($notification->headers)) {
-            $headers = array_merge($headers, $notification->headers);
+            foreach ($notification->headers as $key => $value) {
+                $headers[$key] = $value;
+            }
         }
 
-        curl_setopt_array($ch, array(
-            CURLOPT_POST => TRUE,
-            CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_SSL_VERIFYPEER => FALSE,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_POSTFIELDS => $notification->payload
-        ));
+        $res = Http::withHeaders($headers)->withBody($notification->payload, $contentType)->post($uri);
 
-        // Send the request
-        $response = curl_exec($ch);
-
-        // Check for errors
-        if ($response === FALSE) {
-            throw new Exception(curl_error($ch));
+        if ($res->status() <> 201) {
+            throw new Exception('Error sending notification: ' . $res->status() . ' msg: ' . $res->body());
         }
-
-        $info = curl_getinfo($ch);
-        dump(["response" => $response]);
-
-        dump(["info" => $info]);
-
-        dump(["headers" => $headers, "payload" => $notification->payload]);
-        if ($info['http_code'] <> 201) {
-            throw new Exception('Error sending notification: ' . $info['http_code'] . ' msg: ' . $response);
-        }
-
-
     }
 }
 

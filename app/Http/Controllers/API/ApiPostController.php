@@ -84,9 +84,7 @@ class ApiPostController extends Controller
 
             # Raw
             $notification = new Notification("windows", $url->content);
-            $notification->headers[] = 'X-WNS-Type: wns/raw';
-
-            //  $notification->headers[] = 'ServiceBusNotification-DeviceHandle: ' . ;
+            $notification->headers['X-WNS-Type'] = 'wns/raw';
         } catch (Exception $exception) {
             Log::info('Invalid format for Windows push notification: ' . $exception->getMessage());
             return false;
@@ -102,5 +100,4 @@ class ApiPostController extends Controller
 
         return true;
     }
-
 }
