@@ -18,6 +18,7 @@ class CreateDevicesTable extends Migration
             $table->string('name');
             $table->string('device_token')->nullable();
             $table->foreignId('user_id')->constrained();
+            $table->tinyInteger('device_type_id');
             $table->timestamps();
         });
     }

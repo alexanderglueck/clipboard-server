@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Device;
+use App\Models\DeviceType;
+use App\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DeviceFactory extends Factory
@@ -22,7 +24,9 @@ class DeviceFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->word
+            'name' => $this->faker->word,
+            'user_>' => User::factory(),
+            'device_type_id' => DeviceType::Android->value
         ];
     }
 }
