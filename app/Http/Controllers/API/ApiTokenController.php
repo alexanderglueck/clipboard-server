@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Device;
 use App\Http\Controllers\Controller;
+use App\Models\DeviceType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

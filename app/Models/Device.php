@@ -13,7 +13,9 @@ class Device extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'device_token',
+        'device_type_id'
     ];
 
     public function user(): BelongsTo

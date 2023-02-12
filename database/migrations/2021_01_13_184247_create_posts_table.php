@@ -18,6 +18,7 @@ class CreatePostsTable extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('device_id')->constrained();
             $table->longText('content');
+            $table->tinyInteger('device_type_id');
             $table->timestamps();
         });
     }
