@@ -21,17 +21,16 @@ class ApiPostController extends Controller
     public function store(PostStoreRequest $request): Response
     {
         $post = new Post($request->validated());
-        $deviceId = $request->input('device_id');
+        $post->device_id = $request->input('device_id');
 
         $request->user()->posts()->save($post);
 
-        Log::info("device Id " . $deviceId);
-
+        Log::info("device Id " . $post->device_id);
 
         foreach ($request->user()->devices as $device) {
             Log::info("attempting " . $device->id);
-            if ($deviceId == $device->id) {
-                Log::info("continueing" . $deviceId . " - " . $device->id);
+            if ($post->device_id == $device->id) {
+                Log::info("continueing" . $post->device_id . " - " . $device->id);
                 continue;
             }
 
