@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return 'Clipboard';
-});
+Route::view('/', 'pages.index')->name('pages.index');
+Route::view('/privacy-policy', 'pages.privacy-policy')->name('pages.privacy-policy');
+Route::view('/site-notice', 'pages.site-notice')->name('pages.site-notice');
