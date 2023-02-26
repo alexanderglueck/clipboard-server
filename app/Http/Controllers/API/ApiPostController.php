@@ -5,10 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Azure\Notification;
 use App\Azure\NotificationHub;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PostShowRequest;
 use App\Http\Requests\PostStoreRequest;
 use App\Models\Device;
 use App\Models\DeviceType;
-use App\Post;
+use App\Models\Post;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,13 @@ use LaravelFCM\Message\PayloadDataBuilder;
 
 class ApiPostController extends Controller
 {
+    public function show(PostShowRequest $request, Post $paste)
+    {
+        return [
+            'content' => $paste->content,
+        ];
+    }
+
     public function store(PostStoreRequest $request): Response
     {
         $post = new Post($request->validated());
@@ -55,7 +63,7 @@ class ApiPostController extends Controller
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData([
-            'content' => $post->content,
+            'content' => $post->id,
             'user_id' => $post->user_id
         ]);
 
@@ -75,7 +83,7 @@ class ApiPostController extends Controller
         ]);
     }
 
-    public function sendToWindows(Device $device, Post $url): bool
+    public function sendToWindows(Device $device, Post $post): bool
     {
         $hub = new NotificationHub(config('clipboard.azure.connection_path'), config('clipboard.azure.hub_name'));
 
@@ -83,7 +91,7 @@ class ApiPostController extends Controller
             # https://docs.microsoft.com/en-us/previous-versions/windows/apps/hh465435(v=win.10)
 
             # Raw
-            $notification = new Notification("windows", $url->content);
+            $notification = new Notification("windows", $post->id);
             $notification->headers['X-WNS-Type'] = 'wns/raw';
         } catch (Exception $exception) {
             Log::info('Invalid format for Windows push notification: ' . $exception->getMessage());

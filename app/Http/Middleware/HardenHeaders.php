@@ -20,7 +20,7 @@ class HardenHeaders
 
         $response->header('X-Frame-Options', 'SAMEORIGIN');
         $response->header('X-Content-Type-Options', 'nosniff');
-        $response->header('Content-Security-Policy', "script-src 'self' ");
+//        $response->header('Content-Security-Policy', "script-src 'self' ");
         $response->header('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         return $response;
