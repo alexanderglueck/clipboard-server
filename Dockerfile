@@ -1,13 +1,13 @@
-FROM php:8.1-fpm
+FROM php:8.3-fpm
 
 WORKDIR /app
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions pdo_mysql bcmath pcntl zip gd imagick exif
+    install-php-extensions pdo_mysql bcmath pcntl zip exif
 
-RUN apt-get update -y && apt-get install -y sendmail optipng pngquant unzip
+RUN apt-get update -y && apt-get install -y sendmail unzip
 
 ARG HOST_USER_ID=1000
 ARG HOST_GROUP_ID=1000

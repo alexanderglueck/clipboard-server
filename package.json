@@ -1,14 +1,12 @@
 {
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "vite",
         "build": "vite build"
     },
     "devDependencies": {
-        "autoprefixer": "^9.8.6",
-        "laravel-vite-plugin": "^0.6.0",
-        "vite": "^3.0.0"
-    },
-    "dependencies": {
+        "laravel-vite-plugin": "^1.0.0",
+        "vite": "^5.0.0"
     }
 }
