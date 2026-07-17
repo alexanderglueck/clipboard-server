@@ -10,15 +10,17 @@ use App\Http\Requests\PostStoreRequest;
 use App\Models\Device;
 use App\Models\DeviceType;
 use App\Models\Post;
+use App\Services\FcmPushService;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use LaravelFCM\Facades\FCM;
-use LaravelFCM\Message\OptionsBuilder;
-use LaravelFCM\Message\PayloadDataBuilder;
 
 class ApiPostController extends Controller
 {
+    public function __construct(private readonly FcmPushService $fcm)
+    {
+    }
+
     public function show(PostShowRequest $request, Post $paste)
     {
         return [
@@ -58,29 +60,7 @@ class ApiPostController extends Controller
 
     private function sendToDevice(Device $device, Post $post): void
     {
-        $optionBuilder = new OptionsBuilder();
-        $optionBuilder->setTimeToLive(60 * 20);
-
-        $dataBuilder = new PayloadDataBuilder();
-        $dataBuilder->addData([
-            'content' => $post->id,
-            'user_id' => $post->user_id
-        ]);
-
-        $option = $optionBuilder->build();
-        $data = $dataBuilder->build();
-
-        $downstreamResponse = FCM::sendTo($device->device_token, $option, null, $data);
-
-        Log::info('Push response', [
-            'numSuccess' => $downstreamResponse->numberSuccess(),
-            'numFailure' => $downstreamResponse->numberFailure(),
-            'numModification' => $downstreamResponse->numberModification(),
-            'delete' => $downstreamResponse->tokensToDelete(),
-            'modify' => $downstreamResponse->tokensToModify(),
-            'retry' => $downstreamResponse->tokensToRetry(),
-            'error' => $downstreamResponse->tokensWithError()
-        ]);
+        $this->fcm->sendPostNotification($device, $post);
     }
 
     public function sendToWindows(Device $device, Post $post): bool
