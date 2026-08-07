@@ -4,11 +4,38 @@ on: [push]
 
 jobs:
   tests:
-    name: Deploy
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy
-        run: |
-          if [ "${{ secrets.DEPLOY_HOOK }}" != "" ]; then
-            curl "${{ secrets.DEPLOY_HOOK }}?event=${{ github.event_name }}&ref=${{ github.ref }}&repo=${{ github.repository }}"
-          fi
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Compile assets
+        run: npm run build
+
+      - name: Execute tests
+        run: vendor/bin/phpunit

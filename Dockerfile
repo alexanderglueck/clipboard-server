@@ -1,3 +1,18 @@
+# Assets are built HERE rather than committed: public/build is gitignored, so an
+# image built from a git export would ship no Vite manifest and every page that
+# uses @vite would fail outright.
+FROM node:24-alpine AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+
+RUN npm run build
+
 FROM php:8.5-fpm
 
 WORKDIR /app
@@ -28,7 +43,11 @@ RUN curl -sS https://getcomposer.org/installer | \
 
 COPY . .
 
-RUN composer install
+# --no-dev keeps phpunit and friends out of the production image.
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Must come after `COPY . .`, or the copied tree would overwrite it.
+COPY --from=assets /app/public/build /app/public/build
 
 RUN mkdir -p /home/dockeruser \
   && chown -R dockeruser:dockergroup /home/dockeruser
