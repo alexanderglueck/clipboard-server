@@ -13,7 +13,7 @@ COPY resources ./resources
 
 RUN npm run build
 
-FROM php:8.5-fpm
+FROM php:8.5.12-fpm
 
 WORKDIR /app
 
